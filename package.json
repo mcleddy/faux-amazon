@@ -1,0 +1,10 @@
+{
+    "name": "faux-amazon",
+    "version": "1.0.0",
+    "description": "Amazon-like store",
+    "main": "faux-amazon.js",
+    "dependencies": {
+      "inquirer": "^6.5.2",
+      "mysql": "^2.17.1"
+}
+}
