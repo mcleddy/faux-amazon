@@ -15,33 +15,29 @@ const connection = mysql.createConnection({
     password: "J@nu@ry2",
     database: "fauxAmazon_DB"
 });
-connection.connect(function(err) {
-    if (err) throw err;
-    start();
-});
 
 function start() {
     // connect to the mysql server and sql database
-    connection.query("SELECT * FROM items", function(err, results) {
+    connection.query("SELECT * FROM items", function (err, results) {
         if (err) throw err;
         // run the start function after the connection is made to prompt the user
         console.table('Hello! Welcome to our Shop!')
         console.table('-------------------------------------------------------------------------')
 
         //display items for sale
-        for (let i = 0; i < results.length; i++) {
-            console.table("ID: " + results[i].itemID + "Item: " + results[i].itemName + "Price: " + results[i].price + "Amount in Stock: " + results[i].amountInstock + "Description: " + results[i].description);
+        for (var i = 0; i < results.length; i++) {
+            console.table(" ID: " + results[i].itemID + " Item: " + results[i].itemName + " Price: " + results[i].price + " Amount in Stock: " + results[i].amountInstock + " Description: " + results[i].description);
             console.log("------------------------------------------------------------------------")
         };
 
-        console.log(" ");
+        console.log('');
         inquirer.prompt([
             {
                 type: "input",
                 name: "id",
-                message: "Please type in the ID of the product you would like to buy.",
+                message: "Please type in the ID of the item you would like to buy.",
                 validate: function (value) {
-                    if (isNaN(value) == false && parseInt(value) <= resizeBy.length && parseInt(value) > 0) {
+                    if (isNaN(value) == false && parseInt(value) <= results.length && parseInt(value) > 0) {
                         return true;
                     }
                     else {
@@ -64,13 +60,13 @@ function start() {
             }
         ])
             .then(function (answer) {
-                let itemPurchased = (answer.id) - 1;
-                let quantityOfitems = parseInt(answer.quantity);
-                let total = parseFloat(((res[itemPurchased].price) * quantityOfitems).toFixed(2));
+                var itemPurchased = (answer.id) - 1;
+                var quantityOfitems = parseInt(answer.quantity);
+                var total = parseFloat(((results[itemPurchased].price) * quantityOfitems).toFixed(2));
                 //check if enough is in stock
-                if (res[itemPurchased].amountInstock - quantityOfitems) {
-                    connection.query("UPDATE Items SET ? WHERE ?", [
-                        { stockAmount: (res[itemPurchased].stockAmount - quantityOfitems) },
+                if (results[itemPurchased].amountInstock - quantityOfitems) {
+                    connection.query("UPDATE items SET ? WHERE ?", [
+                        { stockAmount: (results[itemPurchased].stockAmount - quantityOfitems) },
                         { itemID: answer.id }
                     ],
                         function (err, result) {
@@ -88,45 +84,35 @@ function start() {
                         }
                         //update amount sold
                         connection.query("UPDATE Department SET ? WHERE?", [
-                            {totalSold: departmentRes[index].totalSold + total},
-                            {departmentname: res[itemPurchased].departmentname}
-                        ], function(err, departmentRes){
+                            { totalSold: departmentRes[index].totalSold + total },
+                            { departmentname: res[itemPurchased].departmentname }
+                        ], function (err, departmentRes) {
                             if (err) throw err;
-                            });
                         });
+                    });
 
-                    } else{
-                        console.log("Not enough in stock, come back later.");
-                    }
-                    reprompt();
-                })
+                } else {
+                    console.log("Not enough in stock, come back later.");
+                }
+                reprompt();
             })
-        }
-        //ask if customer wants to buy something else
-        function reprompt(){
-            inquirer.prompt([{
-                type:"confirm",
-                name: "reply",
-                message: "Would you like to buy something else?"
-            }])
-            .then(function(answer){
-                if(answer.reply){
-                    start();
-                }
-                else{
-                    console.log("Thanks for visiting our store! Come Again!");
-                }
-            });
-        }
-        start();
+    })
+}
+//ask if customer wants to buy something else
+function reprompt() {
+    inquirer.prompt([{
+        type: "confirm",
+        name: "reply",
+        message: "Would you like to buy something else?"
+    }])
+        .then(function (answer) {
+            if (answer.reply) {
+                start();
+            }
+            else {
+                console.log("Thanks for visiting our store! Come Again!");
+            }
+        });
+}
+start();
 
-
-
-
-
-
-//walk customer through buying item
-
-//check stock amount
-
-//update amount of items
