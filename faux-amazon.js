@@ -59,14 +59,14 @@ function start() {
                 }
             }
         ])
-            .then(function (answer) {
-                var itemPurchased = (answer.id) - 1;
+            .then(function(answer){
+                var itemPurchased = (answer.id)-1;
                 var quantityOfitems = parseInt(answer.quantity);
                 var total = parseFloat(((results[itemPurchased].price) * quantityOfitems).toFixed(2));
                 //check if enough is in stock
                 if (results[itemPurchased].amountInstock - quantityOfitems) {
                     connection.query("UPDATE items SET ? WHERE ?", [
-                        { stockAmount: (results[itemPurchased].stockAmount - quantityOfitems) },
+                        { amountInstock: (results[itemPurchased].amountInstock - quantityOfitems) },
                         { itemID: answer.id }
                     ],
                         function (err, result) {
@@ -74,11 +74,11 @@ function start() {
                             console.log("Your total is $" + total.toFixed(2));
                         });
 
-                    connection.query("SELECT * FROM Department", function (err, departmentRes) {
+                    connection.query("SELECT * FROM Department", function (err, departmentResults) {
                         if (err) throw err;
                         var index;
-                        for (var i = 0; i < departmentRes.length; i++) {
-                            if (departmentRes[i].departmentname === res[itemPurchased].departmentname) {
+                        for (var i = 0; i < departmentResults.length; i++) {
+                            if (departmentResults[i].departmentName === res[itemPurchased].departmentName) {
                                 index = i;
                             }
                         }
@@ -86,7 +86,7 @@ function start() {
                         connection.query("UPDATE Department SET ? WHERE?", [
                             { totalSold: departmentRes[index].totalSold + total },
                             { departmentname: res[itemPurchased].departmentname }
-                        ], function (err, departmentRes) {
+                        ], function (err, departmentRes){
                             if (err) throw err;
                         });
                     });
